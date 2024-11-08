@@ -1,0 +1,350 @@
+import 'package:ehac_money/models/enums/user_role.dart';
+import 'package:ehac_money/services/api_service.dart';
+import 'package:ehac_money/services/auth_service.dart';
+import 'package:ehac_money/widget/success_dialog_witget.dart';
+import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
+import 'package:logger/logger.dart';
+
+class PinCodeScreen extends StatefulWidget {
+  const PinCodeScreen({super.key});
+
+  @override
+  PinCodeScreenState createState() => PinCodeScreenState();
+}
+
+class PinCodeScreenState extends State<PinCodeScreen>
+    with SingleTickerProviderStateMixin {
+  String currentPin = '';
+  late AnimationController _shakeController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.easeInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  void _addDigit(String digit) {
+    if (currentPin.length < 4) {
+      setState(() {
+        currentPin += digit;
+      });
+
+      if (currentPin.length == 4) {
+        _checkPin();
+      }
+    }
+  }
+
+  Future<void> _checkPin() async {
+    String? phoneNumber = await AuthService().getPhoneNumberUser();
+    bool isValid =
+        await AuthService().login(phone: phoneNumber!, password: currentPin);
+
+    if (isValid) {
+      String? userRole = await AuthService().getUserRole();
+
+      if (userRole == UserRole.client.name) {
+        Navigator.pushReplacementNamed(context, '/client/dashboard');
+      } else if (userRole == UserRole.vendor.name) {
+        Navigator.pushReplacementNamed(context, '/vendor/dashboard');
+      } else {
+        Navigator.pushReplacementNamed(context, '/');
+      }
+
+      _resetPin();
+    } else {
+      _shakeController.forward(from: 0.0);
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _resetPin();
+      });
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Empêche la fermeture du dialog en cliquant en dehors
+      builder: (BuildContext context) {
+        return SuccessDialog(message: 'Code PIN Correct!');
+      },
+    );
+
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) Navigator.of(context).pop();
+    });
+  }
+
+
+  void _resetPin() {
+    if (mounted) {
+      setState(() {
+        currentPin = '';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1E88E5), Color(0xFF7E57C2)],
+            stops: [0.0, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: AnimatedBuilder(
+            animation: _shakeController,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(
+                  _shakeController.value *
+                      10 *
+                      math.sin(_shakeController.value * math.pi * 8),
+                  0,
+                ),
+                child: child,
+              );
+            },
+            child: Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildLogo(),
+                      const SizedBox(height: 40),
+                      _buildTitle(),
+                      const SizedBox(height: 40),
+                      _buildPinDots(),
+                      const SizedBox(height: 60),
+                      _buildNumericKeypad(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return TweenAnimationBuilder(
+      tween: Tween<double>(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 1500),
+      builder: (context, double value, child) {
+        return Transform.translate(
+          offset: Offset(0, math.sin(value * math.pi * 2) * 10),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withOpacity(0.1),
+            ),
+            child: Icon(
+              Icons.lock_rounded,
+              size: 80,
+              color: Colors.white.withOpacity(0.9),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTitle() {
+    return Column(
+      children: [
+        Text(
+          'Entrez votre code PIN',
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.9),
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Veuillez saisir votre code à 4 chiffres',
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPinDots() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(4, (index) {
+        final bool isFilled = index < currentPin.length;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 10),
+          width: 20,
+          height: 20,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isFilled ? Colors.white : Colors.transparent,
+            border: Border.all(
+              color: Colors.white.withOpacity(isFilled ? 1 : 0.5),
+              width: 2,
+            ),
+            boxShadow: isFilled
+                ? [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.3),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    )
+                  ]
+                : null,
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildNumericKeypad() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 1.2,
+          crossAxisSpacing: 30,
+          mainAxisSpacing: 20,
+        ),
+        itemCount: 12,
+        itemBuilder: (context, index) {
+          if (index == 9) return _buildOtherButton();
+          if (index == 10) return _buildNumberButton('0');
+          if (index == 11) return _buildBackspaceButton();
+          return _buildNumberButton('${index + 1}');
+        },
+      ),
+    );
+  }
+
+  Widget _buildNumberButton(String number) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _addDigit(number),
+        customBorder: const CircleBorder(),
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withOpacity(0.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              number,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOtherButton() {
+    return TextButton(
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Fonction de récupération non disponible'),
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            backgroundColor: Colors.black87,
+          ),
+        );
+      },
+      child: const Text(
+        'OUBLIÉ?',
+        style: TextStyle(
+          color: Colors.white70,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackspaceButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (currentPin.isNotEmpty) {
+            setState(() {
+              currentPin = currentPin.substring(0, currentPin.length - 1);
+            });
+          }
+        },
+        customBorder: const CircleBorder(),
+        child: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withOpacity(0.1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+              ),
+            ],
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.backspace,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
