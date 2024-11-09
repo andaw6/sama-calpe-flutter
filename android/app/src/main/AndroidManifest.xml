@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Permission pour accéder aux contacts -->
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <application
         android:label="ehac_money"
         android:name="${applicationName}"
