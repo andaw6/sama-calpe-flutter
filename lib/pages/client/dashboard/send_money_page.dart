@@ -1,6 +1,5 @@
 import 'package:ehac_money/pages/client/dashboard/forms/send_money_form.dart';
 import 'package:ehac_money/pages/client/dashboard/qr_code_scanner.dart';
-import 'package:ehac_money/pages/client/dashboard/send_money_form_page.dart';
 import 'package:ehac_money/pages/client/layout/layout.dart';
 import 'package:ehac_money/providers/user_provider.dart';
 import 'package:ehac_money/widget/button_card_widget.dart';
@@ -123,7 +122,7 @@ class SendMoneyPageState extends State<SendMoneyPage> {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => const SendMoneyForm(),
+                  builder: (context) => SendMoneyForm(user: currentUser),
                 );
               },
             ),

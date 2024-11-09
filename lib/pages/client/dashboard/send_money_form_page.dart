@@ -1,8 +1,10 @@
+import 'package:ehac_money/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class SendMoneyFormPage extends StatefulWidget {
-  const SendMoneyFormPage({super.key});
+  final UserInfo? userInfo;
+  const SendMoneyFormPage({super.key,this.userInfo});
 
   @override
   SendMoneyFormPageState createState() => SendMoneyFormPageState();

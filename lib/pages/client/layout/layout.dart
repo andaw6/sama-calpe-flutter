@@ -25,18 +25,17 @@ class BaseLayoutState extends State<ClientLayout> {
   void initState() {
     super.initState();
     _loadUser();  // Chargement de l'utilisateur lors de l'initialisation
-    _tokenExpiryService = TokenExpiryService(context); // Initialiser le service avec le contexte
-    _tokenExpiryService.startTokenExpiryCheck(); // Démarrer la vérification du token
+    //_tokenExpiryService = TokenExpiryService(context); // Initialiser le service avec le contexte
+    //_tokenExpiryService.startTokenExpiryCheck(); // Démarrer la vérification du token
   }
 
-  // Charger l'utilisateur
   Future<void> _loadUser() async {
     await Provider.of<UserProvider>(context, listen: false).loadUser();
   }
 
   @override
   void dispose() {
-    _tokenExpiryService.stopTokenExpiryCheck(); // Arrêter la vérification quand le widget est détruit
+    //_tokenExpiryService.stopTokenExpiryCheck(); // Arrêter la vérification quand le widget est détruit
     super.dispose();
   }
 

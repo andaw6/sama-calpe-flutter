@@ -25,12 +25,13 @@ class ApiResponse<T> {
     return ApiResponse<T>(
       success: json['status'] == 'SUCCESS',
       message: json['message'],
-      data: dataJson is! List ? fromJsonT(dataJson) : null,
-      dataList: dataJson is List ? dataJson.map((item) => fromJsonT(item)).toList() : null,
+      data: (dataJson != null && dataJson is! List) ? fromJsonT(dataJson) : null,
+      dataList: (dataJson != null && dataJson is List) ? dataJson.map((item) => fromJsonT(item)).toList() : null,
       pagination: json['pagination'] != null
           ? Pagination.fromJson(json['pagination'])
           : null,
     );
+
   }
 }
 

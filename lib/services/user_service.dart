@@ -22,14 +22,14 @@ class UserService extends ApiService {
     }
   }
 
-  Future<User?> findByPhone({required String phone}) async {
+  Future<UserInfo?> findByPhone({required String phone}) async {
     final ApiResponse<Map<String, dynamic>> response = await get(
       "/phone/$phone",
       fromJsonT: (json) => json as Map<String, dynamic>,
     );
 
     if(response.success){
-      return User.fromJson(response.data!);
+      return UserInfo.fromJson(response.data!);
     }{
       logger.e("Utilisateur avec le numéro $phone n'exist pas");
       return null;

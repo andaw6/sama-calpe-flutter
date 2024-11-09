@@ -22,9 +22,9 @@ void main() {
       child: const MyApp(),
     ),
   );
+  // getPhoneNumber();
   //testUser();
   // resetToken();
-  //t7estToken();
 
 }
 
@@ -78,6 +78,14 @@ class MyApp extends StatelessWidget {
       return const PinLoginScreen();
     }
   }
+}
+
+Future<void> getPhoneNumber() async{
+  final userService =  UserService();
+  final logger = Logger();
+  final result = userService.findByPhone(phone: "778133536");
+  logger.i(result);
+  return;
 }
 
 Future<void> testUser() async {
