@@ -1,3 +1,4 @@
+import 'package:ehac_money/pages/client/dashboard/dashboard.dart';
 import 'package:ehac_money/services/auth_service.dart';
 import 'package:ehac_money/providers/user_provider.dart'; // Assurez-vous d'importer le UserProvider
 import 'package:flutter/material.dart';
@@ -58,6 +59,10 @@ class AsideBar extends StatelessWidget {
             title: const Text('Tableau de bord'),
             onTap: () {
               Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ClientDashboardPage()),
+              );
             },
           ),
           ListTile(

@@ -48,6 +48,8 @@
 	<!-- Description de l'utilisation des contacts -->
     <key>NSContactsUsageDescription</key>
     <string>Cette application a besoin d'accéder à vos contacts pour vous permettre d'envoyer de l'argent facilement.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cette application nécessite l'accès à la caméra pour scanner les QR codes</string>
 
 </dict>
 </plist>

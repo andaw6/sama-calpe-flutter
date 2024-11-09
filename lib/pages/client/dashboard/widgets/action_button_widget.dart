@@ -19,8 +19,6 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: (){
-        final logger = Logger();
-        logger.d("Test tap");
          onPressed?.call(); 
       },
       borderRadius: BorderRadius.circular(50),

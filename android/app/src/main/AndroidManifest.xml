@@ -2,6 +2,7 @@
 
     <!-- Permission pour accéder aux contacts -->
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:label="ehac_money"

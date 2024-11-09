@@ -1,3 +1,4 @@
+import 'package:ehac_money/pages/client/dashboard/qr_code_scanner.dart';
 import 'package:ehac_money/pages/client/dashboard/send_money_page.dart';
 import 'package:flutter/material.dart';
 import 'package:ehac_money/models/transaction.dart';
@@ -27,8 +28,6 @@ class ClientDashboardState extends State<ClientDashboardPage> {
     super.initState();
   }
 
-
-
   void _navigateTo(Widget page) {
     final logger = Logger();
     logger.i("Tentative de navigation vers la page");
@@ -38,7 +37,6 @@ class ClientDashboardState extends State<ClientDashboardPage> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -76,29 +74,31 @@ class ClientDashboardState extends State<ClientDashboardPage> {
                     ? QrCodeCard(qrCode: qrCode)
                     : const Center(child: Text('QR Code non disponible')),
                 const SizedBox(height: 20),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children:  [
+                  children: [
                     ActionButton(
                       icon: Icons.send,
-                      color: Color(0xFF2962FF),
+                      color: const Color(0xFF2962FF),
                       label: "Transfert",
-                      //onPressed:() => _navigateTo(const SendMoneyPage()),
+                      onPressed: () => _navigateTo(const SendMoneyPage()),
                     ),
-                    ActionButton(
+                    const ActionButton(
                       icon: Icons.receipt_long,
                       color: Color(0xFF3D5AFE),
                       label: "Paiement",
                     ),
-                    ActionButton(
+                    const ActionButton(
                       icon: Icons.account_balance_wallet,
                       color: Color(0xFF2962FF),
                       label: "Crédit",
                     ),
                     ActionButton(
                       icon: Icons.qr_code,
-                      color:  Color(0xFF3D5AFE),
-                      label: "Scanner"),
+                      color: const Color(0xFF3D5AFE),
+                      label: "Scanner",
+                      onPressed: () => _navigateTo(const QRCodeScannerPage()),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 20),
