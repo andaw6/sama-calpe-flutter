@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ehac_money/models/transaction.dart';
 import 'package:ehac_money/widget/transaction_item_widget.dart';
+import 'package:ehac_money/pages/client/dashboard/transaction_detail_page.dart'; // Importer la page de détails
 
 class TransactionHistoryWidget extends StatelessWidget {
   final List<TransactionItem> transactions;
@@ -12,7 +13,6 @@ class TransactionHistoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     List<TransactionItem> sortedTransactions = List.from(transactions); // Crée une copie de la liste
     sortedTransactions.sort((a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0))); // Tri décroissant par date
 
@@ -42,17 +42,32 @@ class TransactionHistoryWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Transactions List - scrollable section with fixed height
-          SizedBox(
-            height: 200, // Adjust the height if necessary
-            child: ListView.separated(
-              itemCount: 1,
-              separatorBuilder: (context, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                return TransactionItemWidget(transaction: transactions[index]);
-              },
-            ),
+          const Divider(height: 1),
+          // Transactions List - scrollable section with separators for all items
+          ListView.separated(
+            shrinkWrap: true,  // Permet à la ListView de s'ajuster automatiquement à la taille de son contenu
+            physics: NeverScrollableScrollPhysics(),  // Empêche un défilement interne pour faire défiler toute la page
+            itemCount: 3,
+            separatorBuilder: (context, index) {
+              // Ajoute un séparateur après chaque élément, y compris le dernier
+              return const Divider(height: 1);
+            },
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  // Naviguer vers la page de détails de la transaction
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TransactionDetailPage(transaction: sortedTransactions[index]),
+                    ),
+                  );
+                },
+                child: TransactionItemWidget(transaction: sortedTransactions[index]),
+              );
+            },
           ),
+          const Divider(height: 1),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(

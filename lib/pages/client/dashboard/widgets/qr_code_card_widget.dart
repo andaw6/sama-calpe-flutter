@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrCodeCard extends StatelessWidget {
-  const QrCodeCard({super.key});
+  final String qrCode;
+  const QrCodeCard({super.key, this.qrCode = "https://wavemoney.com/payment"});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +29,11 @@ class QrCodeCard extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           QrImageView(
-            data: 'https://wavemoney.com/payment',
+            data: qrCode,
             version: QrVersions.auto,
-            size: 140.0,
+            size: 160.0,
           ),
         ],
       ),

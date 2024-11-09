@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class BalanceCard extends StatelessWidget {
   final bool isBalanceVisible;
   final VoidCallback onToggleVisibility;
+  final double amount;
+  final String currency;
 
   const BalanceCard({
     super.key,
     required this.isBalanceVisible,
     required this.onToggleVisibility,
+    required this.amount,
+    this.currency = "XOR"
   });
 
   @override
@@ -43,7 +47,7 @@ class BalanceCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            isBalanceVisible ? '10,000.00 F CFA' : '• • • • • •',
+            isBalanceVisible ? '$amount $currency' : '• • • • • •',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,

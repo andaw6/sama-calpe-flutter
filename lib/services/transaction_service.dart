@@ -42,19 +42,12 @@ class TransactionService extends ApiService {
   // Récupère toutes les transactions pour un utilisateur donné
   List<TransactionItem> getTransactionFromUser(User user) {
     List<TransactionItem> transactionItems = [];
-
-    if (user.transactions != null) {
-      for (var transaction in user.transactions!) {
+      for (var transaction in user.transactions) {
         transactionItems.add(mapToTransactionItem(transaction, true));
       }
-    }
-
-    if (user.received != null) {
-      for (var transaction in user.received!) {
+      for (var transaction in user.received) {
         transactionItems.add(mapToTransactionItem(transaction, false));
       }
-    }
-
     return transactionItems;
   }
 }

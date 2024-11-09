@@ -1,12 +1,9 @@
 import 'package:ehac_money/services/api_service.dart';
-import 'package:logger/logger.dart';
 import 'package:ehac_money/models/api_reponse.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'token_service.dart';
-import 'dart:convert';
 
 class AuthService extends ApiService {
-  final logger = Logger();
   final TokenService _tokenService = TokenService();
 
   AuthService() : super("/auth");
