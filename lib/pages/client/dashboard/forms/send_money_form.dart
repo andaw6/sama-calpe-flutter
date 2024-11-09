@@ -1,5 +1,7 @@
+import 'package:ehac_money/models/user.dart';
+import 'package:ehac_money/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:logger/logger.dart';
 
 class SendMoneyForm extends StatefulWidget {
   const SendMoneyForm({super.key});
@@ -10,13 +12,43 @@ class SendMoneyForm extends StatefulWidget {
 
 class SendMoneyFormState extends State<SendMoneyForm> {
   final _formKey = GlobalKey<FormState>();
+  final userService = UserService();
+  final logger = Logger();
   String? beneficiaryName;
   String? phoneNumber;
-  double? amount;
-  double transactionFeePercent = 0.01; // 1%
+  bool isPhoneNumberValid = false;
+  String errorMessage = '';
 
-  double get transactionFee => (amount ?? 0) * transactionFeePercent;
-  double get totalAmount => (amount ?? 0) + transactionFee;
+  // Function to validate the phone number
+  bool _isSenegalPhoneNumber(String phoneNumber) {
+    final phoneRegex = RegExp(r'^(?:\+221)?(77|76|70|75|78)[0-9]{7}$');
+    return phoneRegex.hasMatch(phoneNumber);
+  }
+
+  // Function to validate phone number and check if it exists in the database
+  Future<void> _validateForm() async {
+    if (!_isSenegalPhoneNumber(phoneNumber!)) {
+      setState(() {
+        isPhoneNumberValid = false;
+        errorMessage = "Numéro invalide. Veuillez entrer un numéro sénégalais.";
+      });
+      return;
+    }
+
+    // Check if the phone number exists in the database
+    final User? exists = await userService.findByPhone(phone: phoneNumber!);
+    if (exists == null) {
+      setState(() {
+        isPhoneNumberValid = false;
+        errorMessage = "Ce numéro de téléphone n'est pas enregistré.";
+      });
+    } else {
+      setState(() {
+        isPhoneNumberValid = true;
+        errorMessage = '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +128,8 @@ class SendMoneyFormState extends State<SendMoneyForm> {
                         filled: true,
                         fillColor: Colors.grey[100],
                       ),
-                      onChanged: (value) => setState(() => beneficiaryName = value),
+                      onChanged: (value) =>
+                          setState(() => beneficiaryName = value),
                     ),
                   ],
                 ),
@@ -125,11 +158,22 @@ class SendMoneyFormState extends State<SendMoneyForm> {
                         fillColor: Colors.grey[100],
                       ),
                       keyboardType: TextInputType.phone,
-                      onChanged: (value) => setState(() => phoneNumber = value),
+                      onChanged: (value) {
+                        setState(() {
+                          phoneNumber = value;
+                          errorMessage = '';
+                        });
+                      },
                     ),
+                    if (errorMessage.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        errorMessage,
+                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                      ),
+                    ],
                   ],
                 ),
-
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -147,12 +191,21 @@ class SendMoneyFormState extends State<SendMoneyForm> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
+                            if (phoneNumber?.isNotEmpty == true &&
+                                beneficiaryName?.isNotEmpty == true) {
+                              await _validateForm();
+                              if (isPhoneNumberValid) {
+                                // Proceed to the next step
+                                // Example: Navigator.of(context).push(...);
+                              }
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple[300],
+                          backgroundColor:
+                              isPhoneNumberValid ? Colors.blue : Colors.grey,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
