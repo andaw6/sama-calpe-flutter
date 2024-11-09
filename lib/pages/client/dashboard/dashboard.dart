@@ -27,13 +27,7 @@ class ClientDashboardState extends State<ClientDashboardPage> {
     super.initState();
   }
 
-  void _navigateToQRScanner() {
-    final logger = Logger();
-    logger.i("Teste cleck");
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => const SendMoneyPage(),
-    ));
-  }
+
 
   void _navigateTo(Widget page) {
     final logger = Logger();
@@ -82,31 +76,29 @@ class ClientDashboardState extends State<ClientDashboardPage> {
                     ? QrCodeCard(qrCode: qrCode)
                     : const Center(child: Text('QR Code non disponible')),
                 const SizedBox(height: 20),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
+                  children:  [
                     ActionButton(
                       icon: Icons.send,
-                      color: const Color(0xFF2962FF),
+                      color: Color(0xFF2962FF),
                       label: "Transfert",
-                      onPressed:() => _navigateTo(const SendMoneyPage()),
+                      //onPressed:() => _navigateTo(const SendMoneyPage()),
                     ),
-                    const ActionButton(
+                    ActionButton(
                       icon: Icons.receipt_long,
                       color: Color(0xFF3D5AFE),
                       label: "Paiement",
                     ),
-                    const ActionButton(
+                    ActionButton(
                       icon: Icons.account_balance_wallet,
                       color: Color(0xFF2962FF),
                       label: "Crédit",
                     ),
                     ActionButton(
                       icon: Icons.qr_code,
-                      color: const Color(0xFF3D5AFE),
-                      label: "Scanner",
-                      onPressed: _navigateToQRScanner, // Add this line
-                    ),
+                      color:  Color(0xFF3D5AFE),
+                      label: "Scanner"),
                   ],
                 ),
                 const SizedBox(height: 20),
