@@ -16,6 +16,7 @@ class QRCodeScannerPageState extends State<QRCodeScannerPage>
   String result = "";
   bool isScanning = true;
   bool isFlashOn = false;
+  bool isLoading = true;
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -34,6 +35,17 @@ class QRCodeScannerPageState extends State<QRCodeScannerPage>
       vsync: this,
     )..repeat(reverse: true);
     _animation = Tween<double>(begin: 0, end: 10).animate(_animationController);
+  }
+
+  Future<void> _initializeScanner() async {
+    await _requestCameraPermission();
+    // Simuler un délai de chargement pour les ressources
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _requestCameraPermission() async {
@@ -105,7 +117,55 @@ class QRCodeScannerPageState extends State<QRCodeScannerPage>
           ),
         ],
       ),
-      body: Container(
+      body: isLoading
+          ? Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [primaryBlue, primaryBlue, Colors.white],
+            stops: [0, 0.2, 0.2],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Loader personnalisé avec animation
+              Container(
+                width: 100,
+                height: 100,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(secondaryBlue),
+                  strokeWidth: 3,
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Initialisation du scanner...',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      )
+          : Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -184,79 +244,79 @@ class QRCodeScannerPageState extends State<QRCodeScannerPage>
                 children: [
                   isScanning
                       ? const Column(
-                          children: [
-                            Icon(
-                              Icons.qr_code_scanner,
-                              size: 50,
-                              color: primaryBlue,
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              'Scannez un QR code',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: accentBlue,
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Placez le code QR dans le cadre pour scanner',
-                              style: TextStyle(
-                                color: Color(0xFF0a2d5c),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            const Icon(
-                              Icons.check_circle,
-                              size: 50,
-                              color: secondaryBlue,
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              'Code scanné : $result',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: accentBlue,
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                setState(() {
-                                  isScanning = true;
-                                  result = "";
-                                });
-                                cameraController.start();
-                              },
-                              icon: const Icon(Icons.refresh),
-                              label: const Text(
-                                'Scanner à nouveau',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryBlue,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                  vertical: 15,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                elevation: 2,
-                              ),
-                            ),
-                          ],
+                    children: [
+                      Icon(
+                        Icons.qr_code_scanner,
+                        size: 50,
+                        color: primaryBlue,
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Scannez un QR code',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: accentBlue,
                         ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Placez le code QR dans le cadre pour scanner',
+                        style: TextStyle(
+                          color: Color(0xFF0a2d5c),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  )
+                      : Column(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        size: 50,
+                        color: secondaryBlue,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Code scanné : $result',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: accentBlue,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            isScanning = true;
+                            result = "";
+                          });
+                          cameraController.start();
+                        },
+                        icon: const Icon(Icons.refresh),
+                        label: const Text(
+                          'Scanner à nouveau',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryBlue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 30,
+                            vertical: 15,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          elevation: 2,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

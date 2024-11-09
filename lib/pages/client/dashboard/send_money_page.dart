@@ -1,5 +1,5 @@
 import 'package:ehac_money/pages/client/dashboard/forms/send_money_form.dart';
-import 'package:ehac_money/pages/client/dashboard/qr_code_scanner.dart';
+import 'package:ehac_money/pages/client/dashboard/transaction_scanner_page.dart';
 import 'package:ehac_money/pages/client/layout/layout.dart';
 import 'package:ehac_money/providers/user_provider.dart';
 import 'package:ehac_money/widget/button_card_widget.dart';
@@ -134,7 +134,7 @@ class SendMoneyPageState extends State<SendMoneyPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const QRCodeScannerPage()),
+                      builder: (context) => const TransactionScannerPage()),
                 );
               },
             ),

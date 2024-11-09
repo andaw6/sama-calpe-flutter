@@ -44,8 +44,9 @@ class SendMoneyFormState extends State<SendMoneyForm> {
         if(phoneNumber == widget.user?.phoneNumber){
           isPhoneNumberValid = false;
           phoneNumberError = "Vous avez saisie votre numéro de compte";
+        }else{
+          beneficiaryName = userSend == null? beneficiaryName : userSend!.name;
         }
-
       });
     } else {
       setState(() {
